@@ -16,7 +16,8 @@ jobs:
             body: New release for ${{ github.sha }}. Release notes can be found in the docs.
             draft: false
             prerelease: false
-
+            runs-on: ubuntu-latest
+            needs: build
     lint:
       runs-on: ubuntu-latest
       steps: 
@@ -58,4 +59,12 @@ jobs:
           with:
             name: zipped-bundle
             path: ${{ github.sha }}.zip
-            
+        - name: Upload release asset
+          uses: actions/upload-release-asset@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.github_token }}
+          with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: ./${{ github.sha }}.zip
+            asset_name: source_code_with_libraries.zip
+            asset_content_type: application/zip
